@@ -193,15 +193,35 @@ public class FiveStarClient: @unchecked Sendable {
     /// Get all available response types for this client.
     /// - Returns: Array of response types
     public func getResponseTypes() async throws -> [ResponseType] {
-        struct RequestBody: Codable {
-            let clientId: String
-        }
-
         struct Response: Codable {
             let types: [ResponseType]?
         }
 
-        let result = try await post("/api/responses/types", body: RequestBody(clientId: clientId), as: Response.self)
+        var components = URLComponents(string: getUrl("/api/responses/types"))
+        components?.queryItems = [URLQueryItem(name: "clientId", value: clientId)]
+
+        guard let url = components?.url else {
+            throw FiveStarAPIError(message: "Invalid URL")
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        for (key, value) in getHeaders() {
+            request.setValue(value, forHTTPHeaderField: key)
+        }
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw FiveStarAPIError(message: "Invalid response")
+        }
+
+        guard httpResponse.statusCode == 200 else {
+            throw FiveStarAPIError(message: "HTTP \(httpResponse.statusCode)", statusCode: httpResponse.statusCode)
+        }
+
+        let result = try decoder.decode(Response.self, from: data)
         return result.types ?? []
     }
 
