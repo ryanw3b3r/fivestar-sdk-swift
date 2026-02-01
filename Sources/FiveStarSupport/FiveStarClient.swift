@@ -253,13 +253,28 @@ public class FiveStarClient: @unchecked Sendable {
             let customerId: String
             let email: String?
             let name: String?
+            let metadata: String?
+
+            func encode(to encoder: Encoder) throws {
+                var container = encoder.container(keyedBy: CodingKeys.self)
+                try container.encode(clientId, forKey: .clientId)
+                try container.encode(customerId, forKey: .customerId)
+                try container.encodeIfPresent(email, forKey: .email)
+                try container.encodeIfPresent(name, forKey: .name)
+                try container.encodeIfPresent(metadata, forKey: .metadata)
+            }
+
+            private enum CodingKeys: String, CodingKey {
+                case clientId, customerId, email, name, metadata
+            }
         }
 
         let body = RequestBody(
             clientId: clientId,
             customerId: customerId,
             email: options?.email,
-            name: options?.name
+            name: options?.name,
+            metadata: options?.metadata
         )
 
         return try await post("/api/customers", body: body, as: RegisterCustomerResult.self)
@@ -297,6 +312,23 @@ public class FiveStarClient: @unchecked Sendable {
             let responseTypeId: String
             let customerEmail: String?
             let customerName: String?
+            let metadata: String?
+
+            func encode(to encoder: Encoder) throws {
+                var container = encoder.container(keyedBy: CodingKeys.self)
+                try container.encode(clientId, forKey: .clientId)
+                try container.encode(customerId, forKey: .customerId)
+                try container.encode(title, forKey: .title)
+                try container.encode(description, forKey: .description)
+                try container.encode(responseTypeId, forKey: .responseTypeId)
+                try container.encodeIfPresent(customerEmail, forKey: .customerEmail)
+                try container.encodeIfPresent(customerName, forKey: .customerName)
+                try container.encodeIfPresent(metadata, forKey: .metadata)
+            }
+
+            private enum CodingKeys: String, CodingKey {
+                case clientId, customerId, title, description, responseTypeId, customerEmail, customerName, metadata
+            }
         }
 
         let body = RequestBody(
@@ -306,7 +338,8 @@ public class FiveStarClient: @unchecked Sendable {
             description: options.description,
             responseTypeId: options.typeId,
             customerEmail: options.email,
-            customerName: options.name
+            customerName: options.name,
+            metadata: options.metadata
         )
 
         return try await post("/api/responses", body: body, as: SubmitResponseResult.self)

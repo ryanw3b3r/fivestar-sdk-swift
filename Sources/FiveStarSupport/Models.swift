@@ -46,10 +46,12 @@ public struct GenerateCustomerIdResult: Codable, Sendable {
 public struct RegisterCustomerOptions: Codable, Sendable {
     public let email: String?
     public let name: String?
+    public let metadata: String?  // JSON-encoded string of metadata dictionary
 
-    public init(email: String? = nil, name: String? = nil) {
+    public init(email: String? = nil, name: String? = nil, metadata: String? = nil) {
         self.email = email
         self.name = name
+        self.metadata = metadata
     }
 }
 
@@ -63,14 +65,16 @@ public struct SubmitResponseOptions: Codable, Sendable {
     public let typeId: String
     public let email: String?
     public let name: String?
+    public let metadata: String?  // JSON-encoded string of metadata dictionary
 
-    public init(customerId: String, title: String, description: String, typeId: String, email: String? = nil, name: String? = nil) {
+    public init(customerId: String, title: String, description: String, typeId: String, email: String? = nil, name: String? = nil, metadata: String? = nil) {
         self.customerId = customerId
         self.title = title
         self.description = description
         self.typeId = typeId
         self.email = email
         self.name = name
+        self.metadata = metadata
     }
 }
 
@@ -150,3 +154,4 @@ public struct FiveStarAPIError: Error, LocalizedError, Sendable {
         return message
     }
 }
+
